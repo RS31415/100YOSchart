@@ -553,6 +553,159 @@
 
     #tooltip.show { opacity: 1; }
 
+    /* ── CARD MODAL ─────────────────────────────────────────── */
+    #card-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(20, 16, 10, 0.72);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    #card-modal.open { display: flex; }
+
+    .modal-box {
+      background: var(--white);
+      border-radius: 6px;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.45);
+      max-width: 560px;
+      width: 100%;
+      display: flex;
+      overflow: hidden;
+      animation: modalIn 0.2s ease forwards;
+      position: relative;
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.93); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-card-col {
+      flex-shrink: 0;
+      width: 176px;
+      background: linear-gradient(160deg, #2a2018 0%, #1a1208 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem 1.25rem;
+    }
+
+    .modal-card-img-wrap {
+      width: 140px;
+      height: 238px;
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.55);
+    }
+
+    .modal-card-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(160deg, #f5f0e6 0%, #d8cdb8 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .modal-card-bg .m-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .modal-card-bg .m-cname {
+      font-size: 0.62rem;
+      color: var(--muted);
+      text-align: center;
+      padding: 0 8px;
+      line-height: 1.4;
+    }
+
+    .modal-card-full {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .modal-info-col {
+      flex: 1;
+      padding: 1.6rem 1.5rem 1.6rem 1.35rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.7rem;
+    }
+
+    .modal-tarot-label {
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .modal-char-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--text);
+    }
+
+    .modal-descriptor {
+      font-size: 0.76rem;
+      color: var(--muted);
+      font-style: italic;
+      margin-top: -0.3rem;
+    }
+
+    .modal-divider {
+      width: 36px;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .modal-rationale {
+      font-size: 0.79rem;
+      line-height: 1.78;
+      color: var(--text);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 0.6rem;
+      right: 0.75rem;
+      background: none;
+      border: none;
+      font-size: 1.05rem;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 0.2rem 0.4rem;
+      border-radius: 2px;
+      line-height: 1;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .modal-close:hover { color: var(--text); background: var(--bg); }
+
+    /* Make thumb show a hint it's clickable */
+    .t-thumb {
+      cursor: zoom-in;
+      transition: opacity 0.15s;
+    }
+
+    .t-thumb:hover { opacity: 0.8; }
+
     /* ── PRINT ───────────────────────────────────────────────── */
     .print-only { display: none; }
 
@@ -562,6 +715,7 @@
       body { height: auto; overflow: visible; }
 
       #intro-screen,
+      #card-modal,
       .top-bar,
       .roster-panel,
       .viz-empty { display: none !important; }
@@ -677,6 +831,29 @@
   </div>
 </div>
 
+<!-- ═══════════════════ CARD MODAL ════════════════════ -->
+<div id="card-modal" onclick="handleModalClick(event)">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeCardModal()" title="Close">✕</button>
+    <div class="modal-card-col">
+      <div class="modal-card-img-wrap" id="modal-img-wrap">
+        <div class="modal-card-bg">
+          <span class="m-num" id="modal-num"></span>
+          <span class="m-cname" id="modal-cname"></span>
+        </div>
+        <img class="modal-card-full" id="modal-img" src="" alt="" onerror="this.style.display='none'">
+      </div>
+    </div>
+    <div class="modal-info-col">
+      <div class="modal-tarot-label" id="modal-tarot-label"></div>
+      <div class="modal-char-name" id="modal-char-name"></div>
+      <div class="modal-descriptor" id="modal-descriptor"></div>
+      <div class="modal-divider"></div>
+      <div class="modal-rationale" id="modal-rationale"></div>
+    </div>
+  </div>
+</div>
+
 <!-- Tooltip -->
 <div id="tooltip"></div>
 
@@ -694,6 +871,7 @@ const CHARACTERS = [
     descriptor: "Patriarch & Founder of Macondo",
     tarot_card: "The Emperor",
     tarot_number: "IV",
+    tarot_rationale: "Visionary patriarch who founds Macondo; a ruler and obsessive dreamer, ultimately dethroned by his own madness and chained to the chestnut tree.",
     presence: [2,2,2,2,2,2,2,1,2,1,1,1,1,1,0,0,0,0,0,0]
   },
   {
@@ -702,6 +880,7 @@ const CHARACTERS = [
     descriptor: "Matriarch",
     tarot_card: "The World",
     tarot_number: "XXI",
+    tarot_rationale: "The binding force of the Buendía family across six generations — enduring, cyclical, ever-present. She is the completed world that holds the household together.",
     presence: [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1]
   },
   {
@@ -710,6 +889,7 @@ const CHARACTERS = [
     descriptor: "The Warrior-Poet",
     tarot_card: "The Chariot",
     tarot_number: "VII",
+    tarot_rationale: "Driven by revolutionary force and inward withdrawal; wins wars and loses himself. He ultimately retreats to making tiny golden fish — motion without destination.",
     presence: [1,2,1,2,2,2,2,2,2,2,2,2,2,2,1,1,1,1,1,1]
   },
   {
@@ -718,6 +898,7 @@ const CHARACTERS = [
     descriptor: "Eldest Son (the Tattooed Giant)",
     tarot_card: "Strength",
     tarot_number: "VIII",
+    tarot_rationale: "Physically colossal, passionate, animalistic — ruled entirely by desire. His arc is raw force that burns brilliantly and extinguishes itself just as fast.",
     presence: [2,1,2,1,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0]
   },
   {
@@ -726,6 +907,7 @@ const CHARACTERS = [
     descriptor: "The Orphan / José Arcadio's Wife",
     tarot_card: "The Moon",
     tarot_number: "XVIII",
+    tarot_rationale: "Arrives mysterious, eats earth and bones, defined by unknowable origins. She retreats into solitude and lives out the rest of the novel as a lunar, sealed-off presence.",
     presence: [0,0,2,2,2,2,1,1,0,2,0,1,1,1,1,0,0,0,0,1]
   },
   {
@@ -734,6 +916,7 @@ const CHARACTERS = [
     descriptor: "Buendía Daughter / The Weaver",
     tarot_card: "The Hermit",
     tarot_number: "IX",
+    tarot_rationale: "Chooses solitude and refusal over love at every turn. She weaves and unweaves her own funeral shroud as an act of willful self-enclosure — a hermit by choice.",
     presence: [0,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,1,1,1]
   },
   {
@@ -742,6 +925,7 @@ const CHARACTERS = [
     descriptor: "Seer / Brothel Keeper",
     tarot_card: "The High Priestess",
     tarot_number: "II",
+    tarot_rationale: "Reads destinies in cards; lover to two generations of Buendía men. Her knowledge and presence span the entire arc of the novel — a guardian of hidden truth.",
     presence: [0,2,2,2,1,2,1,2,1,0,0,0,2,2,0,1,1,0,2,2]
   },
   {
@@ -750,6 +934,7 @@ const CHARACTERS = [
     descriptor: "The Gypsy Sage",
     tarot_card: "The Magician",
     tarot_number: "I",
+    tarot_rationale: "Brings forbidden knowledge, returns from death, and writes the novel's own prophecy in encrypted parchments. He is the original conjurer — the Magician who sets everything in motion.",
     presence: [2,1,2,2,0,2,1,0,2,2,2,2,0,2,0,2,1,2,1,2]
   },
   {
@@ -758,6 +943,7 @@ const CHARACTERS = [
     descriptor: "Son of the Colonel & Pilar Ternera",
     tarot_card: "The Lovers",
     tarot_number: "VI",
+    tarot_rationale: "Defined entirely by his forbidden obsession with Amaranta. His story is a cautionary tale of misdirected eros — desire that warps and ultimately destroys.",
     presence: [0,0,0,1,1,1,2,2,1,0,0,0,1,0,0,0,0,1,0,0]
   },
   {
@@ -766,6 +952,7 @@ const CHARACTERS = [
     descriptor: "The Italian Musician",
     tarot_card: "The Star",
     tarot_number: "XVII",
+    tarot_rationale: "Idealized, refined, and ultimately hopeless. A romantic ideal destroyed by Amaranta's repeated refusal. His suicide is the fall of a star — beautiful light that cannot sustain itself.",
     presence: [0,0,0,2,2,2,2,1,1,1,1,1,1,0,0,0,0,0,0,0]
   },
   {
@@ -774,6 +961,7 @@ const CHARACTERS = [
     descriptor: "Illegitimate Grandson / Village Tyrant",
     tarot_card: "The Tower",
     tarot_number: "XVI",
+    tarot_rationale: "Rises to brief, violent power during the civil wars, destroys what little order exists, and is executed — a lightning-struck tower collapsing under its own hubris.",
     presence: [2,2,2,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0]
   },
   {
@@ -782,6 +970,7 @@ const CHARACTERS = [
     descriptor: "Colonel Aureliano's Wife",
     tarot_card: "The Sun",
     tarot_number: "XIX",
+    tarot_rationale: "Brief, bright, and wholly innocent — her death is the loss of childhood's light from Aureliano's world. Radiance extinguished before it had any chance to dim.",
     presence: [0,0,2,2,2,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0]
   },
   {
@@ -790,6 +979,7 @@ const CHARACTERS = [
     descriptor: "Conservative Magistrate",
     tarot_card: "Justice",
     tarot_number: "XI",
+    tarot_rationale: "Represents corrupt institutional order and the arm of the state. His presence in Macondo triggers the cycles of civil war that consume the novel's middle chapters.",
     presence: [0,0,2,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0]
   },
   {
@@ -798,6 +988,7 @@ const CHARACTERS = [
     descriptor: "Aureliano's Most Loyal Officer",
     tarot_card: "The Hierophant",
     tarot_number: "V",
+    tarot_rationale: "Faithful to institutions, codes, and duty above all else. He courts Amaranta with principled dignity and remains a keeper of order amid the chaos of endless war.",
     presence: [0,0,0,1,2,2,2,2,2,2,2,1,1,1,0,0,0,0,0,0]
   },
   {
@@ -806,6 +997,7 @@ const CHARACTERS = [
     descriptor: "Arcadio's Widow / Silent Servant",
     tarot_card: "Temperance",
     tarot_number: "XIV",
+    tarot_rationale: "Wordless, selfless, and enduring. She serves the Buendía household invisibly for decades, perfectly balancing every demand — and then quietly walks out and disappears.",
     presence: [0,0,0,0,0,1,1,2,2,2,2,2,2,2,2,2,2,1,0,0]
   },
   {
@@ -814,6 +1006,7 @@ const CHARACTERS = [
     descriptor: "Twin / Festive Spendthrift",
     tarot_card: "The Wheel of Fortune",
     tarot_number: "X",
+    tarot_rationale: "His life is defined by cycles of abundance and ruin. His livestock multiply magically, his feasts are legendary — and then the wheel turns, and everything turns to dust.",
     presence: [0,0,0,0,0,0,1,1,1,2,2,1,2,2,2,2,2,1,0,1]
   },
   {
@@ -822,6 +1015,7 @@ const CHARACTERS = [
     descriptor: "Twin / Witness to the Massacre",
     tarot_card: "The Hanged Man",
     tarot_number: "XII",
+    tarot_rationale: "The sole witness to a history the world refuses to acknowledge. Suspended in Melquíades' room, he awaits revelation — a man hung between truth and erasure.",
     presence: [0,0,0,0,0,0,1,1,1,2,1,0,1,0,2,0,2,1,0,0]
   },
   {
@@ -830,6 +1024,7 @@ const CHARACTERS = [
     descriptor: "Aureliano Segundo's Wife",
     tarot_card: "The Empress",
     tarot_number: "III",
+    tarot_rationale: "An imaginary queen of a crumbling court. She enforces rigid hierarchies and elaborate rituals in a house that has long outlived the order she insists on maintaining.",
     presence: [0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,0,0]
   },
   {
@@ -838,6 +1033,7 @@ const CHARACTERS = [
     descriptor: "Arcadio's Daughter / Transcendent Figure",
     tarot_card: "The Fool",
     tarot_number: "0",
+    tarot_rationale: "Innocent beyond all comprehension, utterly indifferent to the world's conventions. Her ascension into the sky is a literal escape from narrative — she steps off the edge of the story.",
     presence: [0,0,0,0,0,0,0,1,1,0,2,2,2,1,1,0,0,0,0,0]
   },
   {
@@ -846,6 +1042,7 @@ const CHARACTERS = [
     descriptor: "Aureliano Segundo's Concubine",
     tarot_card: "The Moon",
     tarot_number: "XVIII",
+    tarot_rationale: "Earthy, nocturnal, and magnetically fertile. Her love for Aureliano Segundo is the only stable force in his chaotic life — and ultimately the only loyalty that survives ruin.",
     presence: [0,0,0,0,0,1,0,0,0,2,2,1,2,2,2,2,2,1,0,0]
   },
   {
@@ -854,6 +1051,7 @@ const CHARACTERS = [
     descriptor: "Fernanda's Daughter / Aureliano's Mother",
     tarot_card: "The Star",
     tarot_number: "XVII",
+    tarot_rationale: "A silenced light and hidden depths. Her story is one of suppressed vitality — a star extinguished by her mother's rigid will before it has any chance to shine.",
     presence: [0,0,0,0,0,0,0,0,0,0,1,0,2,2,2,1,1,0,0,0]
   },
   {
@@ -862,6 +1060,7 @@ const CHARACTERS = [
     descriptor: "Meme's Lover / The Yellow Butterflies",
     tarot_card: "The Lovers",
     tarot_number: "VI",
+    tarot_rationale: "Pure, fatal desire heralded by a cloud of yellow butterflies. His story is Meme's mirror — his paralysis by a sniper's bullet is the physical embodiment of their love's truncation.",
     presence: [0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,0,0,0]
   },
   {
@@ -870,6 +1069,7 @@ const CHARACTERS = [
     descriptor: "Fernanda's Son / The False Priest",
     tarot_card: "The Devil",
     tarot_number: "XV",
+    tarot_rationale: "Sent away to become a pope, he returns dissolute, decadent, and corrupt. He is the ruin of sacred aspiration — a devil masquerading in priestly robes.",
     presence: [0,0,0,0,0,0,0,0,0,0,0,0,2,1,1,1,1,2,2,0]
   },
   {
@@ -878,6 +1078,7 @@ const CHARACTERS = [
     descriptor: "Last Vital Buendía / Úrsula Reborn",
     tarot_card: "Judgement",
     tarot_number: "XX",
+    tarot_rationale: "Her return to Macondo is the final summoning of Buendía vitality. Like the angel's trumpet call of Judgement, her arrival is a last reckoning — and her death seals the family's fate.",
     presence: [0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,2,2,2,2,2]
   },
   {
@@ -886,6 +1087,7 @@ const CHARACTERS = [
     descriptor: "Son of Meme & Mauricio / Final Buendía",
     tarot_card: "Judgement",
     tarot_number: "XX",
+    tarot_rationale: "The figure who finally decodes Melquíades' parchments and reads the family's entire history in a single moment. He is the last call before the end — revelation and annihilation at once.",
     presence: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2]
   },
   {
@@ -894,6 +1096,7 @@ const CHARACTERS = [
     descriptor: "Amaranta Úrsula's Belgian Husband",
     tarot_card: "The Fool",
     tarot_number: "0",
+    tarot_rationale: "A restless traveler perpetually waiting for an airplane that never arrives. Ultimately irrelevant to Macondo's story, his departure leaves Amaranta Úrsula unmoored and available to catastrophe.",
     presence: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,0]
   },
   {
@@ -902,6 +1105,7 @@ const CHARACTERS = [
     descriptor: "The Levitating Priest",
     tarot_card: "The Hierophant",
     tarot_number: "V",
+    tarot_rationale: "His levitation — induced by hot chocolate — collapses theology and magic into the same gesture. In Macondo, faith and miracle are indistinguishable from each other.",
     presence: [0,0,1,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,1]
   },
   {
@@ -910,6 +1114,7 @@ const CHARACTERS = [
     descriptor: "Banana Company Director",
     tarot_card: "The Tower",
     tarot_number: "XVI",
+    tarot_rationale: "The face of the extractive colonial force that destroys Macondo's last era of prosperity. He and the banana company build everything and then abandon it — leaving a tower of ruin.",
     presence: [0,0,0,0,0,0,0,0,0,0,2,0,2,2,2,1,0,0,0,0]
   },
   {
@@ -918,6 +1123,7 @@ const CHARACTERS = [
     descriptor: "Colonel Aureliano's Sons",
     tarot_card: "The Star",
     tarot_number: "XVII",
+    tarot_rationale: "Seventeen brief lights born across the continent and extinguished on a single Ash Wednesday. A collective fate, a collective tragedy — seventeen stars blotted out at once.",
     presence: [0,0,0,0,0,0,0,0,0,0,1,0,2,1,0,0,0,0,0,1]
   },
   {
@@ -926,6 +1132,7 @@ const CHARACTERS = [
     descriptor: "Indian Servant / Carrier of Insomnia Plague",
     tarot_card: "The High Priestess",
     tarot_number: "II",
+    tarot_rationale: "Arrives carrying hidden, ancestral knowledge — the insomnia curse from her tribe's past. Like the High Priestess, she guards a secret that the Buendías only partially understand.",
     presence: [0,2,2,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0]
   },
   {
@@ -934,6 +1141,7 @@ const CHARACTERS = [
     descriptor: "The Ghost / José Arcadio's Victim",
     tarot_card: "Death",
     tarot_number: "XIII",
+    tarot_rationale: "The first death in the novel — and a death that refuses to stay buried. His ghost haunts José Arcadio Buendía across time and continent. He is the past that cannot be escaped.",
     presence: [2,2,1,0,0,2,0,1,0,0,0,0,0,0,0,0,0,0,0,0]
   },
   {
@@ -942,6 +1150,7 @@ const CHARACTERS = [
     descriptor: "The Last Aureliano's Lover",
     tarot_card: "The Moon",
     tarot_number: "XVIII",
+    tarot_rationale: "Mysterious, sensual, and deeply earthly — a nocturnal counterweight to Amaranta Úrsula's brightness. She is present at the very end of the bloodline, when everything is turning to dust.",
     presence: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1]
   },
   {
@@ -950,6 +1159,7 @@ const CHARACTERS = [
     descriptor: "The Last Aureliano's Friend / Alter Ego",
     tarot_card: "The Magician",
     tarot_number: "I",
+    tarot_rationale: "García Márquez's self-insertion into his own novel — the writer who escapes Macondo by leaving to write about it. He is the only character who walks out before the end arrives.",
     presence: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2]
   }
 ];
@@ -1064,19 +1274,18 @@ function renderRoster() {
       const card = document.createElement('div');
       card.className = 'c-card' + (on ? ' on' : '');
       card.dataset.id = id;
-      card.onclick = () => toggle(id);
 
       const thumbBorder = on ? `box-shadow: 0 0 0 2.5px ${color}, 0 2px 6px rgba(0,0,0,0.18);` : '';
 
       card.innerHTML = `
-        <div class="t-thumb" style="${thumbBorder}">
+        <div class="t-thumb" style="${thumbBorder}" title="Click to view card" onclick="openCardModal('${id}'); event.stopPropagation();">
           <div class="t-bg">
             <span class="t-num">${ch.tarot_number}</span>
             <span class="t-label">${ch.tarot_card}</span>
           </div>
           ${imgUrl ? `<img class="t-img" src="${imgUrl}" alt="${ch.tarot_card}" loading="lazy" onerror="this.style.display='none'">` : ''}
         </div>
-        <div class="c-info">
+        <div class="c-info" onclick="toggle('${id}'); event.stopPropagation();" style="cursor:pointer;">
           <div class="c-name" style="${on ? `color:${color}` : ''}">${ch.name}</div>
           <div class="c-desc">${ch.descriptor}</div>
         </div>`;
@@ -1213,6 +1422,46 @@ function positionTip(e) {
 function updatePrintFooter(chars) {
   document.getElementById('print-char-list').textContent =
     'Characters selected: ' + chars.map(c => c.name).join(' · ');
+}
+
+/* ────────────────────────────────────────────────────────
+   CARD MODAL
+──────────────────────────────────────────────────────── */
+function openCardModal(id) {
+  const ch = byId(id);
+  if (!ch) return;
+
+  const imgUrl = TAROT_IMG[ch.tarot_card] || '';
+
+  document.getElementById('modal-num').textContent    = ch.tarot_number;
+  document.getElementById('modal-cname').textContent  = ch.tarot_card;
+  document.getElementById('modal-tarot-label').textContent =
+    `${ch.tarot_number} · ${ch.tarot_card}`;
+  document.getElementById('modal-char-name').textContent  = ch.name;
+  document.getElementById('modal-descriptor').textContent = ch.descriptor;
+  document.getElementById('modal-rationale').textContent  = ch.tarot_rationale || '';
+
+  const img = document.getElementById('modal-img');
+  img.style.display = '';
+  img.src = imgUrl;
+  img.alt = ch.tarot_card;
+
+  document.getElementById('card-modal').classList.add('open');
+  document.addEventListener('keydown', handleModalKey);
+}
+
+function closeCardModal() {
+  document.getElementById('card-modal').classList.remove('open');
+  document.removeEventListener('keydown', handleModalKey);
+  document.getElementById('modal-img').src = '';
+}
+
+function handleModalClick(e) {
+  if (e.target === document.getElementById('card-modal')) closeCardModal();
+}
+
+function handleModalKey(e) {
+  if (e.key === 'Escape') closeCardModal();
 }
 </script>
 </body>
