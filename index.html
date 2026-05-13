@@ -370,7 +370,7 @@
 
     /* Chart */
     .chart-wrap {
-      min-width: 860px;
+      min-width: 980px;
     }
 
     /* Chapter header row */
@@ -398,7 +398,7 @@
     .c-row {
       display: flex;
       align-items: center;
-      height: 42px;
+      height: 48px;
       border-bottom: 1px solid #EDE8DF;
       opacity: 0;
       animation: fadeIn 0.22s ease forwards;
@@ -469,33 +469,70 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 42px;
+      height: 48px;
       position: relative;
     }
 
     .cell.act-end { border-right: 1px dashed var(--border); }
 
-    /* Presence markers */
-    .dot {
-      border-radius: 50%;
-      transition: transform 0.13s;
-      cursor: default;
+    /* ── Presence markers — tarot cards ────────────────────── */
+    .presence-card {
+      width: 22px;
+      height: 37px;
+      border-radius: 2px;
+      overflow: hidden;
       flex-shrink: 0;
+      cursor: default;
+      position: relative;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+      transition: transform 0.14s ease, box-shadow 0.14s ease;
+      z-index: 1;
     }
 
-    .dot:hover { transform: scale(1.45); }
-
-    .dot-active {
-      width: 13px;
-      height: 13px;
+    .presence-card:hover {
+      transform: scale(1.65) translateY(-3px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.32);
+      z-index: 10;
     }
 
-    .dot-mention {
-      width: 9px;
-      height: 9px;
-      background: transparent !important;
-      border-width: 2px;
-      border-style: solid;
+    /* Face card: character's tarot image */
+    .face-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(160deg, #f5f0e6 0%, #ddd4c0 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 6px;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .card-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Back card: tarot card obverse (reverse side) */
+    .back-inner {
+      position: absolute;
+      inset: 0;
+      background-color: #1E3560;
+      background-image:
+        repeating-linear-gradient(45deg,  rgba(255,255,255,0.11) 0, rgba(255,255,255,0.11) 1px, transparent 1px, transparent 6px),
+        repeating-linear-gradient(-45deg, rgba(255,255,255,0.11) 0, rgba(255,255,255,0.11) 1px, transparent 1px, transparent 6px);
+    }
+
+    .back-inner::after {
+      content: '';
+      position: absolute;
+      inset: 2.5px;
+      border: 1px solid rgba(184, 134, 11, 0.55);
+      border-radius: 1px;
     }
 
     /* ── TOOLTIP ─────────────────────────────────────────────── */
@@ -629,9 +666,9 @@
       <div class="print-only" id="print-footer">
         <div class="print-title">One Hundred Years of Solitude — Character Arc Map</div>
         <div class="print-legend">
-          <span>● &nbsp;Active Presence</span>
-          <span>◌ &nbsp;Mentioned in Passing</span>
-          <span>— &nbsp;Absent</span>
+          <span>🂠 Card Face &nbsp;=&nbsp; Active Presence</span>
+          <span>🂡 Card Back &nbsp;=&nbsp; Mentioned in Passing</span>
+          <span>[ blank ] &nbsp;=&nbsp; Absent</span>
         </div>
         <div id="print-char-list"></div>
       </div>
@@ -1123,15 +1160,20 @@ function renderChart() {
 
       let marker = '';
       if (val === 2) {
-        marker = `<div class="dot dot-active"
-          style="background:${color};"
+        /* Card face — character's assigned tarot card */
+        marker = `<div class="presence-card"
           data-n="${ch.name}" data-c="${chNum}" data-t="Active Presence"
-          onmouseenter="tip(event,this)" onmouseleave="untip()"></div>`;
+          onmouseenter="tip(event,this)" onmouseleave="untip()">
+          <div class="face-bg">${ch.tarot_number}</div>
+          ${imgUrl ? `<img class="card-img" src="${imgUrl}" loading="lazy" onerror="this.style.display='none'">` : ''}
+        </div>`;
       } else if (val === 1) {
-        marker = `<div class="dot dot-mention"
-          style="border-color:${color};"
+        /* Card back — tarot obverse (indicates character is mentioned) */
+        marker = `<div class="presence-card"
           data-n="${ch.name}" data-c="${chNum}" data-t="Mentioned in Passing"
-          onmouseenter="tip(event,this)" onmouseleave="untip()"></div>`;
+          onmouseenter="tip(event,this)" onmouseleave="untip()">
+          <div class="back-inner"></div>
+        </div>`;
       }
 
       html += `<div class="cell${endClass}">${marker}</div>`;
