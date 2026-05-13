@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Macondo Constellation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ── RESET & BASE ────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:           #FAF7F0;
+      --white:        #FFFFFF;
+      --border:       #E0D9CE;
+      --text:         #2C2C2C;
+      --muted:        #7A7060;
+      --accent:       #B8860B;
+      --accent-bg:    #F5E9C8;
+      --shadow-sm:    0 1px 4px rgba(0,0,0,0.10);
+      --shadow-md:    0 2px 10px rgba(0,0,0,0.12);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── INTRO SCREEN ────────────────────────────────────────── */
+    #intro-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    #intro-screen.hidden { display: none !important; }
+
+    .intro-glyph {
+      font-size: 1.4rem;
+      letter-spacing: 0.6rem;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      opacity: 0.7;
+    }
+
+    .intro-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.15;
+      margin-bottom: 0.6rem;
+    }
+
+    .intro-subtitle {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1rem;
+      color: var(--muted);
+      margin-bottom: 2rem;
+    }
+
+    .intro-rule {
+      width: 64px;
+      height: 1px;
+      background: var(--accent);
+      margin: 0 auto 1.75rem;
+    }
+
+    .intro-body {
+      max-width: 520px;
+      font-size: 0.9rem;
+      line-height: 1.85;
+      color: var(--muted);
+      margin-bottom: 2.5rem;
+    }
+
+    .btn-primary {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--white);
+      background: var(--text);
+      border: none;
+      padding: 0.85rem 2.75rem;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover { background: var(--accent); }
+
+    /* ── MAIN APP ────────────────────────────────────────────── */
+    #main-app {
+      display: none;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    #main-app.active { display: flex; }
+
+    /* ── TOP BAR ─────────────────────────────────────────────── */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.25rem;
+      height: 50px;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .top-bar-left {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+    }
+
+    .app-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+    }
+
+    .app-sub {
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .btn-print {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: var(--text);
+      background: transparent;
+      border: 1px solid var(--border);
+      padding: 0.35rem 0.9rem;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+
+    .btn-print:hover {
+      background: var(--text);
+      color: var(--white);
+      border-color: var(--text);
+    }
+
+    /* ── LAYOUT ──────────────────────────────────────────────── */
+    .layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── ROSTER PANEL ────────────────────────────────────────── */
+    .roster-panel {
+      width: 290px;
+      flex-shrink: 0;
+      background: var(--white);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .roster-top {
+      padding: 0.65rem 0.9rem;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .roster-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.45rem;
+    }
+
+    .roster-count {
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    .roster-count em {
+      font-style: normal;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 0.35rem;
+    }
+
+    .btn-sm {
+      font-size: 0.67rem;
+      font-weight: 500;
+      color: var(--muted);
+      background: none;
+      border: 1px solid var(--border);
+      padding: 0.18rem 0.55rem;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: all 0.15s;
+    }
+
+    .btn-sm:hover { color: var(--text); border-color: var(--muted); }
+
+    .roster-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.25rem 0 0.75rem;
+    }
+
+    .roster-scroll::-webkit-scrollbar { width: 4px; }
+    .roster-scroll::-webkit-scrollbar-track { background: transparent; }
+    .roster-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* Generation header */
+    .gen-label {
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0.7rem 0.9rem 0.25rem;
+      margin-top: 0.3rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .gen-label:first-child { border-top: none; margin-top: 0; }
+
+    /* Character card in roster */
+    .c-card {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.42rem 0.9rem;
+      cursor: pointer;
+      border-radius: 3px;
+      margin: 0 0.4rem;
+      transition: background 0.13s;
+      user-select: none;
+    }
+
+    .c-card:hover { background: var(--bg); }
+    .c-card.on { background: var(--accent-bg); }
+
+    /* Tarot thumbnail */
+    .t-thumb {
+      width: 34px;
+      height: 58px;
+      flex-shrink: 0;
+      border-radius: 3px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.15s;
+    }
+
+    .c-card.on .t-thumb {
+      /* dynamic border via JS inline style */
+    }
+
+    .t-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(160deg, #f5f0e6 0%, #ddd4c0 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+    }
+
+    .t-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 7.5px;
+      color: var(--accent);
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .t-label {
+      font-size: 4.5px;
+      color: var(--muted);
+      text-align: center;
+      padding: 0 2px;
+      line-height: 1.3;
+    }
+
+    .t-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .c-info { flex: 1; min-width: 0; }
+
+    .c-name {
+      font-size: 0.77rem;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.3;
+    }
+
+    .c-card.on .c-name { font-weight: 600; }
+
+    .c-desc {
+      font-size: 0.65rem;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.4;
+      margin-top: 1px;
+    }
+
+    /* ── VIZ PANEL ───────────────────────────────────────────── */
+    .viz-panel {
+      flex: 1;
+      overflow: auto;
+      padding: 1.25rem 1.5rem;
+      position: relative;
+    }
+
+    .viz-panel::-webkit-scrollbar { height: 5px; width: 5px; }
+    .viz-panel::-webkit-scrollbar-track { background: transparent; }
+    .viz-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* Empty state */
+    .viz-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 0.6rem;
+      color: var(--muted);
+    }
+
+    .viz-empty-glyph {
+      font-size: 2.2rem;
+      opacity: 0.2;
+    }
+
+    .viz-empty-msg {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 0.95rem;
+    }
+
+    /* Chart */
+    .chart-wrap {
+      min-width: 860px;
+    }
+
+    /* Chapter header row */
+    .ch-header {
+      display: flex;
+      align-items: center;
+      padding-left: 196px;
+      margin-bottom: 4px;
+    }
+
+    .ch-lbl {
+      flex: 1;
+      text-align: center;
+      font-size: 0.62rem;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+    }
+
+    .ch-lbl.act-end {
+      border-right: 1px dashed var(--border);
+    }
+
+    /* Character row */
+    .c-row {
+      display: flex;
+      align-items: center;
+      height: 42px;
+      border-bottom: 1px solid #EDE8DF;
+      opacity: 0;
+      animation: fadeIn 0.22s ease forwards;
+    }
+
+    @keyframes fadeIn { to { opacity: 1; } }
+
+    .c-row:hover { background: rgba(255,255,255,0.65); }
+
+    /* Row label (left side of each character row) */
+    .row-lbl {
+      width: 196px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding-right: 0.6rem;
+    }
+
+    .row-mini {
+      width: 20px;
+      height: 34px;
+      border-radius: 2px;
+      overflow: hidden;
+      flex-shrink: 0;
+      position: relative;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .row-mini-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(160deg, #f0ece2 0%, #d8d0c0 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 5.5px;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .row-mini-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .row-name {
+      font-size: 0.69rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Cells */
+    .row-cells {
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+
+    .cell {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 42px;
+      position: relative;
+    }
+
+    .cell.act-end { border-right: 1px dashed var(--border); }
+
+    /* Presence markers */
+    .dot {
+      border-radius: 50%;
+      transition: transform 0.13s;
+      cursor: default;
+      flex-shrink: 0;
+    }
+
+    .dot:hover { transform: scale(1.45); }
+
+    .dot-active {
+      width: 13px;
+      height: 13px;
+    }
+
+    .dot-mention {
+      width: 9px;
+      height: 9px;
+      background: transparent !important;
+      border-width: 2px;
+      border-style: solid;
+    }
+
+    /* ── TOOLTIP ─────────────────────────────────────────────── */
+    #tooltip {
+      position: fixed;
+      background: #2C2C2C;
+      color: #fff;
+      font-size: 0.7rem;
+      padding: 0.3rem 0.6rem;
+      border-radius: 3px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.12s;
+      z-index: 9999;
+      white-space: nowrap;
+      line-height: 1.5;
+    }
+
+    #tooltip.show { opacity: 1; }
+
+    /* ── PRINT ───────────────────────────────────────────────── */
+    .print-only { display: none; }
+
+    @media print {
+      @page { size: landscape; margin: 1.2cm; }
+
+      body { height: auto; overflow: visible; }
+
+      #intro-screen,
+      .top-bar,
+      .roster-panel,
+      .viz-empty { display: none !important; }
+
+      #main-app { display: block !important; height: auto; }
+
+      .layout { display: block; }
+
+      .viz-panel {
+        overflow: visible;
+        padding: 0;
+      }
+
+      .chart-wrap { min-width: unset; width: 100%; }
+
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      color-adjust: exact;
+
+      .print-only {
+        display: block;
+        margin-top: 1.25rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--border);
+        font-size: 0.68rem;
+        color: var(--muted);
+      }
+
+      .print-legend {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 0.4rem;
+      }
+
+      .print-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 0.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════ INTRO SCREEN ═══════════════════ -->
+<div id="intro-screen">
+  <div class="intro-glyph">✦ &nbsp; ✦ &nbsp; ✦</div>
+  <h1 class="intro-title">The Macondo Constellation</h1>
+  <p class="intro-subtitle">Visualizing Character Presence in <em>One Hundred Years of Solitude</em></p>
+  <div class="intro-rule"></div>
+  <p class="intro-body">
+    Each character in the novel has been assigned a tarot card that reflects their symbolic role.
+    Browse the character roster on the left and click any character's card to add them to your visualization.
+    Select multiple characters to see how their arcs overlap across all twenty chapters.
+    When you're ready to save or print your visualization, use the button at the top right.
+  </p>
+  <button class="btn-primary" onclick="startApp()">Explore the Novel</button>
+</div>
+
+<!-- ═══════════════════ MAIN APP ════════════════════════ -->
+<div id="main-app">
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <span class="app-title">The Macondo Constellation</span>
+      <span class="app-sub">One Hundred Years of Solitude</span>
+    </div>
+    <button class="btn-print" onclick="window.print()">Save / Print Visualization</button>
+  </div>
+
+  <!-- Layout -->
+  <div class="layout">
+
+    <!-- Roster Panel -->
+    <div class="roster-panel">
+      <div class="roster-top">
+        <div class="roster-meta">
+          <span class="roster-count"><em id="sel-count">0</em> of 33 selected</span>
+          <div class="btn-row">
+            <button class="btn-sm" onclick="selectAll()">Select All</button>
+            <button class="btn-sm" onclick="clearAll()">Clear</button>
+          </div>
+        </div>
+      </div>
+      <div class="roster-scroll" id="roster-list"></div>
+    </div>
+
+    <!-- Viz Panel -->
+    <div class="viz-panel">
+
+      <div class="viz-empty" id="viz-empty">
+        <div class="viz-empty-glyph">☽</div>
+        <div class="viz-empty-msg">Select a character from the roster to begin.</div>
+      </div>
+
+      <div class="chart-wrap" id="chart-wrap" style="display:none;"></div>
+
+      <!-- Print-only footer -->
+      <div class="print-only" id="print-footer">
+        <div class="print-title">One Hundred Years of Solitude — Character Arc Map</div>
+        <div class="print-legend">
+          <span>● &nbsp;Active Presence</span>
+          <span>◌ &nbsp;Mentioned in Passing</span>
+          <span>— &nbsp;Absent</span>
+        </div>
+        <div id="print-char-list"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Tooltip -->
+<div id="tooltip"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════════════════ -->
+<script>
+/* ────────────────────────────────────────────────────────
+   CHARACTER DATA
+──────────────────────────────────────────────────────── */
+const CHARACTERS = [
+  {
+    id: "jose_arcadio_buendia",
+    name: "José Arcadio Buendía",
+    descriptor: "Patriarch & Founder of Macondo",
+    tarot_card: "The Emperor",
+    tarot_number: "IV",
+    presence: [2,2,2,2,2,2,2,1,2,1,1,1,1,1,0,0,0,0,0,0]
+  },
+  {
+    id: "ursula",
+    name: "Úrsula Iguarán",
+    descriptor: "Matriarch",
+    tarot_card: "The World",
+    tarot_number: "XXI",
+    presence: [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1]
+  },
+  {
+    id: "col_aureliano",
+    name: "Colonel Aureliano Buendía",
+    descriptor: "The Warrior-Poet",
+    tarot_card: "The Chariot",
+    tarot_number: "VII",
+    presence: [1,2,1,2,2,2,2,2,2,2,2,2,2,2,1,1,1,1,1,1]
+  },
+  {
+    id: "jose_arcadio_son",
+    name: "José Arcadio",
+    descriptor: "Eldest Son (the Tattooed Giant)",
+    tarot_card: "Strength",
+    tarot_number: "VIII",
+    presence: [2,1,2,1,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0]
+  },
+  {
+    id: "rebeca",
+    name: "Rebeca",
+    descriptor: "The Orphan / José Arcadio's Wife",
+    tarot_card: "The Moon",
+    tarot_number: "XVIII",
+    presence: [0,0,2,2,2,2,1,1,0,2,0,1,1,1,1,0,0,0,0,1]
+  },
+  {
+    id: "amaranta",
+    name: "Amaranta",
+    descriptor: "Buendía Daughter / The Weaver",
+    tarot_card: "The Hermit",
+    tarot_number: "IX",
+    presence: [0,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,1,1,1]
+  },
+  {
+    id: "pilar_ternera",
+    name: "Pilar Ternera",
+    descriptor: "Seer / Brothel Keeper",
+    tarot_card: "The High Priestess",
+    tarot_number: "II",
+    presence: [0,2,2,2,1,2,1,2,1,0,0,0,2,2,0,1,1,0,2,2]
+  },
+  {
+    id: "melquiades",
+    name: "Melquíades",
+    descriptor: "The Gypsy Sage",
+    tarot_card: "The Magician",
+    tarot_number: "I",
+    presence: [2,1,2,2,0,2,1,0,2,2,2,2,0,2,0,2,1,2,1,2]
+  },
+  {
+    id: "aureliano_jose",
+    name: "Aureliano José",
+    descriptor: "Son of the Colonel & Pilar Ternera",
+    tarot_card: "The Lovers",
+    tarot_number: "VI",
+    presence: [0,0,0,1,1,1,2,2,1,0,0,0,1,0,0,0,0,1,0,0]
+  },
+  {
+    id: "pietro_crespi",
+    name: "Pietro Crespi",
+    descriptor: "The Italian Musician",
+    tarot_card: "The Star",
+    tarot_number: "XVII",
+    presence: [0,0,0,2,2,2,2,1,1,1,1,1,1,0,0,0,0,0,0,0]
+  },
+  {
+    id: "arcadio",
+    name: "Arcadio",
+    descriptor: "Illegitimate Grandson / Village Tyrant",
+    tarot_card: "The Tower",
+    tarot_number: "XVI",
+    presence: [2,2,2,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0]
+  },
+  {
+    id: "remedios_moscote",
+    name: "Remedios Moscote",
+    descriptor: "Colonel Aureliano's Wife",
+    tarot_card: "The Sun",
+    tarot_number: "XIX",
+    presence: [0,0,2,2,2,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0]
+  },
+  {
+    id: "don_apolinar",
+    name: "Don Apolinar Moscote",
+    descriptor: "Conservative Magistrate",
+    tarot_card: "Justice",
+    tarot_number: "XI",
+    presence: [0,0,2,2,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0]
+  },
+  {
+    id: "col_gerineldo",
+    name: "Colonel Gerineldo Márquez",
+    descriptor: "Aureliano's Most Loyal Officer",
+    tarot_card: "The Hierophant",
+    tarot_number: "V",
+    presence: [0,0,0,1,2,2,2,2,2,2,2,1,1,1,0,0,0,0,0,0]
+  },
+  {
+    id: "santa_sofia",
+    name: "Santa Sofía de la Piedad",
+    descriptor: "Arcadio's Widow / Silent Servant",
+    tarot_card: "Temperance",
+    tarot_number: "XIV",
+    presence: [0,0,0,0,0,1,1,2,2,2,2,2,2,2,2,2,2,1,0,0]
+  },
+  {
+    id: "aureliano_segundo",
+    name: "Aureliano Segundo",
+    descriptor: "Twin / Festive Spendthrift",
+    tarot_card: "The Wheel of Fortune",
+    tarot_number: "X",
+    presence: [0,0,0,0,0,0,1,1,1,2,2,1,2,2,2,2,2,1,0,1]
+  },
+  {
+    id: "jose_arcadio_segundo",
+    name: "José Arcadio Segundo",
+    descriptor: "Twin / Witness to the Massacre",
+    tarot_card: "The Hanged Man",
+    tarot_number: "XII",
+    presence: [0,0,0,0,0,0,1,1,1,2,1,0,1,0,2,0,2,1,0,0]
+  },
+  {
+    id: "fernanda",
+    name: "Fernanda del Carpio",
+    descriptor: "Aureliano Segundo's Wife",
+    tarot_card: "The Empress",
+    tarot_number: "III",
+    presence: [0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,0,0]
+  },
+  {
+    id: "remedios_beauty",
+    name: "Remedios the Beauty",
+    descriptor: "Arcadio's Daughter / Transcendent Figure",
+    tarot_card: "The Fool",
+    tarot_number: "0",
+    presence: [0,0,0,0,0,0,0,1,1,0,2,2,2,1,1,0,0,0,0,0]
+  },
+  {
+    id: "petra_cotes",
+    name: "Petra Cotes",
+    descriptor: "Aureliano Segundo's Concubine",
+    tarot_card: "The Moon",
+    tarot_number: "XVIII",
+    presence: [0,0,0,0,0,1,0,0,0,2,2,1,2,2,2,2,2,1,0,0]
+  },
+  {
+    id: "meme",
+    name: "Meme (Renata Remedios)",
+    descriptor: "Fernanda's Daughter / Aureliano's Mother",
+    tarot_card: "The Star",
+    tarot_number: "XVII",
+    presence: [0,0,0,0,0,0,0,0,0,0,1,0,2,2,2,1,1,0,0,0]
+  },
+  {
+    id: "mauricio_babilonia",
+    name: "Mauricio Babilonia",
+    descriptor: "Meme's Lover / The Yellow Butterflies",
+    tarot_card: "The Lovers",
+    tarot_number: "VI",
+    presence: [0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,0,0,0]
+  },
+  {
+    id: "jose_arcadio_ii",
+    name: "José Arcadio II",
+    descriptor: "Fernanda's Son / The False Priest",
+    tarot_card: "The Devil",
+    tarot_number: "XV",
+    presence: [0,0,0,0,0,0,0,0,0,0,0,0,2,1,1,1,1,2,2,0]
+  },
+  {
+    id: "amaranta_ursula",
+    name: "Amaranta Úrsula",
+    descriptor: "Last Vital Buendía / Úrsula Reborn",
+    tarot_card: "Judgement",
+    tarot_number: "XX",
+    presence: [0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,2,2,2,2,2]
+  },
+  {
+    id: "aureliano_last",
+    name: "Aureliano (The Last)",
+    descriptor: "Son of Meme & Mauricio / Final Buendía",
+    tarot_card: "Judgement",
+    tarot_number: "XX",
+    presence: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2]
+  },
+  {
+    id: "gaston",
+    name: "Gastón",
+    descriptor: "Amaranta Úrsula's Belgian Husband",
+    tarot_card: "The Fool",
+    tarot_number: "0",
+    presence: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,0]
+  },
+  {
+    id: "father_nicanor",
+    name: "Father Nicanor Reyna",
+    descriptor: "The Levitating Priest",
+    tarot_card: "The Hierophant",
+    tarot_number: "V",
+    presence: [0,0,1,0,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,1]
+  },
+  {
+    id: "mr_brown",
+    name: "Mr. Jack Brown",
+    descriptor: "Banana Company Director",
+    tarot_card: "The Tower",
+    tarot_number: "XVI",
+    presence: [0,0,0,0,0,0,0,0,0,0,2,0,2,2,2,1,0,0,0,0]
+  },
+  {
+    id: "seventeen_aurelianos",
+    name: "The Seventeen Aurelianos",
+    descriptor: "Colonel Aureliano's Sons",
+    tarot_card: "The Star",
+    tarot_number: "XVII",
+    presence: [0,0,0,0,0,0,0,0,0,0,1,0,2,1,0,0,0,0,0,1]
+  },
+  {
+    id: "visitacion",
+    name: "Visitación",
+    descriptor: "Indian Servant / Carrier of Insomnia Plague",
+    tarot_card: "The High Priestess",
+    tarot_number: "II",
+    presence: [0,2,2,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0]
+  },
+  {
+    id: "prudencio_aguilar",
+    name: "Prudencio Aguilar",
+    descriptor: "The Ghost / José Arcadio's Victim",
+    tarot_card: "Death",
+    tarot_number: "XIII",
+    presence: [2,2,1,0,0,2,0,1,0,0,0,0,0,0,0,0,0,0,0,0]
+  },
+  {
+    id: "nigromanta",
+    name: "Nigromanta",
+    descriptor: "The Last Aureliano's Lover",
+    tarot_card: "The Moon",
+    tarot_number: "XVIII",
+    presence: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1]
+  },
+  {
+    id: "gabriel_friend",
+    name: "Gabriel (The Writer)",
+    descriptor: "The Last Aureliano's Friend / Alter Ego",
+    tarot_card: "The Magician",
+    tarot_number: "I",
+    presence: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2]
+  }
+];
+
+/* ────────────────────────────────────────────────────────
+   GENERATION GROUPS
+──────────────────────────────────────────────────────── */
+const GROUPS = [
+  {
+    label: "Founders & Generation One",
+    ids: ["jose_arcadio_buendia","ursula","prudencio_aguilar","visitacion","melquiades","pilar_ternera"]
+  },
+  {
+    label: "Children of José Arcadio Buendía & Úrsula",
+    ids: ["col_aureliano","jose_arcadio_son","amaranta"]
+  },
+  {
+    label: "Generation Two — Grandchildren & Contemporaries",
+    ids: ["arcadio","rebeca","aureliano_jose","remedios_moscote","don_apolinar","col_gerineldo","pietro_crespi","father_nicanor"]
+  },
+  {
+    label: "Generation Three",
+    ids: ["santa_sofia","aureliano_segundo","jose_arcadio_segundo","remedios_beauty","fernanda","petra_cotes","seventeen_aurelianos"]
+  },
+  {
+    label: "Generation Four",
+    ids: ["meme","jose_arcadio_ii","mauricio_babilonia"]
+  },
+  {
+    label: "Generations Five & Six — Final Buendías",
+    ids: ["amaranta_ursula","aureliano_last","gaston","nigromanta","gabriel_friend","mr_brown"]
+  }
+];
+
+/* ────────────────────────────────────────────────────────
+   TAROT IMAGE URLs  (Wikimedia Commons — public domain)
+──────────────────────────────────────────────────────── */
+const TAROT_IMG = {
+  "The Fool":           "https://upload.wikimedia.org/wikipedia/commons/9/90/RWS_Tarot_00_Fool.jpg",
+  "The Magician":       "https://upload.wikimedia.org/wikipedia/commons/d/de/RWS_Tarot_01_Magician.jpg",
+  "The High Priestess": "https://upload.wikimedia.org/wikipedia/commons/8/88/RWS_Tarot_02_High_Priestess.jpg",
+  "The Empress":        "https://upload.wikimedia.org/wikipedia/commons/d/d2/RWS_Tarot_03_Empress.jpg",
+  "The Emperor":        "https://upload.wikimedia.org/wikipedia/commons/c/c3/RWS_Tarot_04_Emperor.jpg",
+  "The Hierophant":     "https://upload.wikimedia.org/wikipedia/commons/8/8d/RWS_Tarot_05_Hierophant.jpg",
+  "The Lovers":         "https://upload.wikimedia.org/wikipedia/commons/3/3a/TheLovers.jpg",
+  "The Chariot":        "https://upload.wikimedia.org/wikipedia/commons/9/9b/RWS_Tarot_07_Chariot.jpg",
+  "Strength":           "https://upload.wikimedia.org/wikipedia/commons/f/f5/RWS_Tarot_08_Strength.jpg",
+  "The Hermit":         "https://upload.wikimedia.org/wikipedia/commons/4/4d/RWS_Tarot_09_Hermit.jpg",
+  "The Wheel of Fortune":"https://upload.wikimedia.org/wikipedia/commons/3/3c/RWS_Tarot_10_Wheel_of_Fortune.jpg",
+  "Justice":            "https://upload.wikimedia.org/wikipedia/commons/e/e0/RWS_Tarot_11_Justice.jpg",
+  "The Hanged Man":     "https://upload.wikimedia.org/wikipedia/commons/2/2b/RWS_Tarot_12_Hanged_Man.jpg",
+  "Death":              "https://upload.wikimedia.org/wikipedia/commons/d/d7/RWS_Tarot_13_Death.jpg",
+  "Temperance":         "https://upload.wikimedia.org/wikipedia/commons/f/f8/RWS_Tarot_14_Temperance.jpg",
+  "The Devil":          "https://upload.wikimedia.org/wikipedia/commons/5/55/RWS_Tarot_15_Devil.jpg",
+  "The Tower":          "https://upload.wikimedia.org/wikipedia/commons/5/53/RWS_Tarot_16_Tower.jpg",
+  "The Star":           "https://upload.wikimedia.org/wikipedia/commons/d/db/RWS_Tarot_17_Star.jpg",
+  "The Moon":           "https://upload.wikimedia.org/wikipedia/commons/7/7f/RWS_Tarot_18_Moon.jpg",
+  "The Sun":            "https://upload.wikimedia.org/wikipedia/commons/1/17/RWS_Tarot_19_Sun.jpg",
+  "Judgement":          "https://upload.wikimedia.org/wikipedia/commons/d/dd/RWS_Tarot_20_Judgement.jpg",
+  "The World":          "https://upload.wikimedia.org/wikipedia/commons/f/ff/RWS_Tarot_21_World.jpg"
+};
+
+/* ────────────────────────────────────────────────────────
+   COLOR PALETTE
+──────────────────────────────────────────────────────── */
+const PALETTE = [
+  "#2E4057","#E07A5F","#3D405B","#81B29A","#C2820A",
+  "#6B4226","#4A90A4","#9B59B6","#457B9D","#D4A017",
+  "#264653","#E8805A","#5B8DB8","#C9184A","#52B788",
+  "#9B2226","#B5838D","#6D6875","#E76F51","#023E8A"
+];
+
+/* ────────────────────────────────────────────────────────
+   STATE
+──────────────────────────────────────────────────────── */
+const selected = new Set();
+
+function byId(id) { return CHARACTERS.find(c => c.id === id); }
+function colorOf(id) { return PALETTE[CHARACTERS.findIndex(c => c.id === id) % PALETTE.length]; }
+
+/* ────────────────────────────────────────────────────────
+   BOOT
+──────────────────────────────────────────────────────── */
+function startApp() {
+  document.getElementById('intro-screen').classList.add('hidden');
+  const app = document.getElementById('main-app');
+  app.classList.add('active');
+  renderRoster();
+  renderChart();
+}
+
+/* ────────────────────────────────────────────────────────
+   ROSTER
+──────────────────────────────────────────────────────── */
+function renderRoster() {
+  const list = document.getElementById('roster-list');
+  list.innerHTML = '';
+
+  GROUPS.forEach(group => {
+    const hdr = document.createElement('div');
+    hdr.className = 'gen-label';
+    hdr.textContent = group.label;
+    list.appendChild(hdr);
+
+    group.ids.forEach(id => {
+      const ch = byId(id);
+      if (!ch) return;
+      const on = selected.has(id);
+      const color = colorOf(id);
+      const imgUrl = TAROT_IMG[ch.tarot_card] || '';
+
+      const card = document.createElement('div');
+      card.className = 'c-card' + (on ? ' on' : '');
+      card.dataset.id = id;
+      card.onclick = () => toggle(id);
+
+      const thumbBorder = on ? `box-shadow: 0 0 0 2.5px ${color}, 0 2px 6px rgba(0,0,0,0.18);` : '';
+
+      card.innerHTML = `
+        <div class="t-thumb" style="${thumbBorder}">
+          <div class="t-bg">
+            <span class="t-num">${ch.tarot_number}</span>
+            <span class="t-label">${ch.tarot_card}</span>
+          </div>
+          ${imgUrl ? `<img class="t-img" src="${imgUrl}" alt="${ch.tarot_card}" loading="lazy" onerror="this.style.display='none'">` : ''}
+        </div>
+        <div class="c-info">
+          <div class="c-name" style="${on ? `color:${color}` : ''}">${ch.name}</div>
+          <div class="c-desc">${ch.descriptor}</div>
+        </div>`;
+
+      list.appendChild(card);
+    });
+  });
+
+  document.getElementById('sel-count').textContent = selected.size;
+}
+
+/* ────────────────────────────────────────────────────────
+   TOGGLE / SELECT ALL / CLEAR
+──────────────────────────────────────────────────────── */
+function toggle(id) {
+  selected.has(id) ? selected.delete(id) : selected.add(id);
+  renderRoster();
+  renderChart();
+}
+
+function selectAll() {
+  CHARACTERS.forEach(c => selected.add(c.id));
+  renderRoster();
+  renderChart();
+}
+
+function clearAll() {
+  selected.clear();
+  renderRoster();
+  renderChart();
+}
+
+/* ────────────────────────────────────────────────────────
+   CHART
+──────────────────────────────────────────────────────── */
+function renderChart() {
+  const empty = document.getElementById('viz-empty');
+  const wrap  = document.getElementById('chart-wrap');
+
+  const chars = CHARACTERS.filter(c => selected.has(c.id));
+
+  if (chars.length === 0) {
+    empty.style.display = 'flex';
+    wrap.style.display  = 'none';
+    return;
+  }
+
+  empty.style.display = 'none';
+  wrap.style.display  = 'block';
+
+  /* ── Chapter header ── */
+  let html = '<div class="ch-header">';
+  for (let i = 1; i <= 20; i++) {
+    const end = (i === 5 || i === 10 || i === 15) ? ' act-end' : '';
+    html += `<div class="ch-lbl${end}">Ch.&nbsp;${i}</div>`;
+  }
+  html += '</div>';
+
+  /* ── Character rows ── */
+  chars.forEach(ch => {
+    const color  = colorOf(ch.id);
+    const imgUrl = TAROT_IMG[ch.tarot_card] || '';
+
+    html += `<div class="c-row">`;
+
+    /* Row label */
+    html += `<div class="row-lbl">
+      <div class="row-mini">
+        <div class="row-mini-bg">${ch.tarot_number}</div>
+        ${imgUrl ? `<img class="row-mini-img" src="${imgUrl}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}
+      </div>
+      <div class="row-name" style="color:${color};">${ch.name}</div>
+    </div>`;
+
+    /* Cells */
+    html += '<div class="row-cells">';
+    for (let i = 0; i < 20; i++) {
+      const val = ch.presence[i];
+      const chNum = i + 1;
+      const endClass = (chNum === 5 || chNum === 10 || chNum === 15) ? ' act-end' : '';
+
+      let marker = '';
+      if (val === 2) {
+        marker = `<div class="dot dot-active"
+          style="background:${color};"
+          data-n="${ch.name}" data-c="${chNum}" data-t="Active Presence"
+          onmouseenter="tip(event,this)" onmouseleave="untip()"></div>`;
+      } else if (val === 1) {
+        marker = `<div class="dot dot-mention"
+          style="border-color:${color};"
+          data-n="${ch.name}" data-c="${chNum}" data-t="Mentioned in Passing"
+          onmouseenter="tip(event,this)" onmouseleave="untip()"></div>`;
+      }
+
+      html += `<div class="cell${endClass}">${marker}</div>`;
+    }
+    html += '</div></div>';
+  });
+
+  wrap.innerHTML = html;
+  updatePrintFooter(chars);
+}
+
+/* ────────────────────────────────────────────────────────
+   TOOLTIP
+──────────────────────────────────────────────────────── */
+const $tip = document.getElementById('tooltip');
+
+function tip(e, el) {
+  $tip.innerHTML = `<strong>${el.dataset.n}</strong> &nbsp;·&nbsp; Chapter ${el.dataset.c} &nbsp;·&nbsp; ${el.dataset.t}`;
+  $tip.classList.add('show');
+  positionTip(e);
+}
+
+function untip() { $tip.classList.remove('show'); }
+
+document.addEventListener('mousemove', e => {
+  if ($tip.classList.contains('show')) positionTip(e);
+});
+
+function positionTip(e) {
+  $tip.style.left = (e.clientX + 14) + 'px';
+  $tip.style.top  = (e.clientY - 34) + 'px';
+}
+
+/* ────────────────────────────────────────────────────────
+   PRINT FOOTER
+──────────────────────────────────────────────────────── */
+function updatePrintFooter(chars) {
+  document.getElementById('print-char-list').textContent =
+    'Characters selected: ' + chars.map(c => c.name).join(' · ');
+}
+</script>
+</body>
+</html>
